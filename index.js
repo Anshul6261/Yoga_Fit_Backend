@@ -17,14 +17,15 @@ mongoose.connect(process.env.MONGO_URI)
     .then(() => console.log("Connected to MongoDB"))
     .catch((err) => console.log("Failed to connect to MongoDB:", err));
 
-  app.use(
-    cors({
-      origin: "http://localhost:5173",  // Allow both origins
-      methods: ["GET", "POST", "PUT", "DELETE"],
-      allowedHeaders: ["Content-Type", "Authorization"],
-      credentials: true,
-    })
-  );
+  // app.use(
+  //   cors({
+  //     origin: "http://localhost:5173",  // Allow both origins
+  //     methods: ["GET", "POST", "PUT", "DELETE"],
+  //     allowedHeaders: ["Content-Type", "Authorization"],
+  //     credentials: true,
+  //   })
+  // );
+  app.use(cors());
 app.use(express.json()); 
 // Basic route to check if the server is running
 app.get('/', (req, res) => {
