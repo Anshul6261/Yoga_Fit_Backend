@@ -11,5 +11,5 @@ const blogSchema = new mongoose.Schema({
 
   
   // Specify 'Blog' as the collection name
-  const Blog = mongoose.model('Blog', blogSchema);
-  export default Blog;
+  const Blogs = mongoose.model('Blog', blogSchema);
+  export default Blogs;
