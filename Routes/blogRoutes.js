@@ -1,7 +1,7 @@
 /* eslint-disable no-unused-vars */
 import express from 'express';
-import Blog from '../models/Blogs.js';
-import Comment from '../models/comment.js';
+import Blog from '../Models/Blogs.js';  // Capital M
+import Comment from '../Models/comment.js';
 
 const router = express.Router();
 
