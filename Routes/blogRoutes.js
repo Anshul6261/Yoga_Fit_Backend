@@ -71,12 +71,13 @@ router.delete('/blogs/:id', async (req, res) => {
 router.put('/blogs/:id/like', async (req, res) => {
   try {
     const blog = await Blog.findById(req.params.id);
+    const {userID} = req.body;
     if (!blog) {
       return res.status(404).json({ message: 'Blog post not found' });
     }
 
     // Increment likes by 1
-    blog.likes += 1;
+blog.likes.push({ userId: userID, count: 1 });
     await blog.save();
 
     res.status(200).json({ message: 'Like added!', likes: blog.likes });
@@ -98,11 +99,12 @@ router.get('/blogs/:blogId/comments', async (req, res) => {
 // Route to post a comment for a blog post
 router.post('/blogs/:blogId/comments', async (req, res) => {
   try {
-    const { author, content } = req.body;
+    const { author, content, imageUrl } = req.body;
     const newComment = new Comment({
       author,
       blogId: req.params.blogId,
       content,
+      imageUrl,
     });
     await newComment.save();
     res.status(201).json(newComment);
@@ -114,17 +116,17 @@ router.post('/blogs/:blogId/comments', async (req, res) => {
 // Route to post a reply to a comment
 router.post('/blogs/:blogId/comments/:commentId/replies', async (req, res) => {
   try {
-    const { author, content } = req.body;
+    const { author, content, imageUrl } = req.body;
     const comment = await Comment.findById(req.params.commentId);
 
     if (!comment) {
       return res.status(404).json({ error: 'Comment not found' });
     }
 
-    comment.replies.push({ author, content });
+    comment.replies.push({ author, content, imageUrl });
     await comment.save();
 
-    res.status(201).json(comment);
+    res.status(201).json(comment.replies[comment.replies.length - 1]); // Return the newly added reply
   } catch (err) {
     res.status(500).json({ error: 'Server error while adding reply' });
   }

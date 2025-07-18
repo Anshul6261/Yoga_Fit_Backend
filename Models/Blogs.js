@@ -6,7 +6,13 @@ const blogSchema = new mongoose.Schema({
     author: { type: String, required: true },
     datePosted: { type: Date, default: Date.now },
     imageUrl: { type: String, required: true },
-    likes: { type: Number, default: 0 } // New field for likes, defaulting to 0
+    likes: [
+      {
+        userId: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
+        count : { type: Number, default: 0 }
+      }
+    ]
+    // likes: { type: Number, default: 0 } // New field for likes, defaulting to 0
   });
 
   
