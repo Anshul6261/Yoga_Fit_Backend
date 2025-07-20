@@ -2,7 +2,8 @@
 import express from 'express';
 import Blog from '../Models/Blogs.js';  // Capital M
 import Comment from '../Models/comment.js';
-
+import authenticateJWT from '../../middleware.js';
+ // Assuming you have a middleware for authentication
 const router = express.Router();
 
 // Route to get all blog posts
@@ -131,5 +132,57 @@ router.post('/blogs/:blogId/comments/:commentId/replies', async (req, res) => {
     res.status(500).json({ error: 'Server error while adding reply' });
   }
 });
+
+
+
+// DELETE /blogs/:blogId/comments/:commentId
+router.delete('/blogs/:blogId/comments/:commentId', authenticateJWT, async (req, res) => {
+  const { commentId } = req.params;
+  const user = req.user; // Make sure to extract user properly if you use Clerk or JWT
+  
+  try {
+    const comment = await Comment.findById(commentId);
+    if (!comment) return res.status(404).json({ message: 'Comment not found' });
+
+    if (comment.author !== user.username) {
+      return res.status(403).json({ message: 'Unauthorized' });
+    }
+
+    await comment.deleteOne();
+    res.json({ message: 'Comment deleted successfully' });
+  } catch (err) {
+    console.error('Error deleting comment:', err);
+    res.status(500).json({ message: 'Server error' });
+  }
+});
+
+
+// DELETE /blogs/:blogId/comments/:commentId/replies/:replyId
+router.delete('/blogs/:blogId/comments/:commentId/replies/:replyId', authenticateJWT, async (req, res) => {
+  const { commentId, replyId } = req.params;
+  const user = req.user;
+
+  try {
+    const comment = await Comment.findById(commentId);
+    if (!comment) return res.status(404).json({ message: 'Comment not found' });
+
+    const replyIndex = comment.replies.findIndex(r => r._id.toString() === replyId);
+    if (replyIndex === -1) return res.status(404).json({ message: 'Reply not found' });
+
+    const reply = comment.replies[replyIndex];
+    if (reply.author !== user.fullName && reply.author !== user.username) {
+      return res.status(403).json({ message: 'Unauthorized' });
+    }
+
+    comment.replies.splice(replyIndex, 1);
+    await comment.save();
+
+    res.json({ message: 'Reply deleted successfully' });
+  } catch (err) {
+    console.error('Error deleting reply:', err);
+    res.status(500).json({ message: 'Server error' });
+  }
+});
+
 
 export default router;
