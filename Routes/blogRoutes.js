@@ -2,7 +2,7 @@
 import express from 'express';
 import Blog from '../Models/Blogs.js';  // Capital M
 import Comment from '../Models/comment.js';
-import authenticateJWT from '../../middleware.js';
+import authenticateJWT from '../middleware.js';
  // Assuming you have a middleware for authentication
 const router = express.Router();
 
