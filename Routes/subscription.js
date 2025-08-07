@@ -8,45 +8,7 @@ import crypto from "crypto";
 
 const router = express.Router();
 
-// router.post("/subscribe", authenticateJWT, async (req, res) => {
-//     try {
-//         const { plan } = req.body;
-//         const userId = req.user.id;
 
-//         const planDetails = {
-//             "monthly": { cost: 200, duration: 1 },
-//             "six-months": { cost: 900, duration: 6 },
-//             "yearly": { cost: 1200, duration: 12 }
-//         };
-
-//         if (!planDetails[plan.name]) {
-//             return res.status(400).json({ success: false, message: "Invalid plan selected" });
-//         }
-
-//         const { cost, duration } = planDetails[plan.name];
-//         const startDate = new Date();
-//         const endDate = new Date();
-//         endDate.setMonth(endDate.getMonth() + duration);
-
-//         const newSubscription = new Subscription({
-//             userId,
-//             plan: plan.name,
-//             cost,
-//             status: "active",
-//             startDate,
-//             endDate,
-//             transactionId: crypto.randomBytes(16).toString("hex")
-//         });
-
-//         await newSubscription.save();
-//         res.status(201).json({ success: true, message: "Subscription successful", subscription: newSubscription });
-
-//     } catch (error) {
-//         console.error("Subscription error:", error);
-//         res.status(500).json({ success: false, message: "Server error" });
-//     }
-// });
-// In your backend route file
 router.post("/subscribe", authenticateJWT, async (req, res) => {
     try {
         const { plan } = req.body;
@@ -105,6 +67,9 @@ router.get("/check-subscription", authenticateJWT, async (req, res) => {
         res.json({ subscribed: true });
     } catch (error) {
         console.error(error);
+        if (error.message === "Access token expired") {
+            return res.status(401).json({ subscribed: false, error: "Access token expired" });
+        }
         res.status(500).json({ subscribed: false, error: "Server error" });
     }
 });
